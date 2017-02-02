@@ -1,0 +1,102 @@
+// out: ../css/style.css
+@SidebarWidth: 200px;
+@SidebarBG: #f8f8f8;
+@MainBG: #f0f0f0;
+@Color-default: #202428;
+@Color-inverse: #fff;
+@Color-links: #5d6576;
+@Color-error: #a03035;
+@Color-active: #2d85c5;
+
+/*COMMON */
+html {overflow-y: scroll;}
+body {background: @MainBG; font: 16px/1.25 'Lato', sans-serif; position: relative; color: @Color-default;}
+#wrapper {box-sizing: border-box; width: 100%; border-left: @SidebarWidth solid @SidebarBG;}
+a {text-decoration: underline;}
+h1 {margin: 0.5em 0;}
+.error_msg {color: @Color-error;}
+
+
+/* SIDEBAR */
+#main_nav {position: fixed; left: 0; top: 0; width: @SidebarWidth; height: 100%; background: @SidebarBG;}
+nav.main_nav {    
+    h2 {margin: 15px 0; padding: 0 15px;}
+    & > ul {
+        list-style: none; margin: 0; padding: 0; 
+        & > li {margin: 0; padding: 0; 
+            a {display: block; height: 33px; line-height: 30px; margin: 0; padding: 0 15px; transition: all 0.3s; color: @Color-links; text-decoration: none;}
+            a:hover {background: lighten(@Color-links, 45%); text-shadow: 3px 3px 3px rgba(0,0,0,0.3); text-decoration: none;}
+            a.active, a.active:hover{cursor: default; background: @Color-active; color: @Color-inverse; text-shadow: none;}
+        }
+    }
+}
+
+/* FOOTER */
+.main_footer {margin: 0; padding: 0; background:  #888; color: #000; text-align: center; padding: 0 10px; line-height: 30px; height: 30px; font-size: 14px;}
+nav.navbar.navbar-fixed-bottom {margin-bottom: 0; min-height: 0; }
+.sf-toolbarreset {bottom: 31px !important;}
+@media (min-width: 768px) {
+    @-webkit-keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .sf-toolbar { opacity: 0; -webkit-animation: fade-in 1s .2s forwards; animation: fade-in 1s .2s forwards;}
+}
+
+/* MAIN */
+#wrapper {padding: 15px 15px 15px 30px;}
+.page {
+    display: none;
+    p.add {margin: 1em 0;}
+}
+table {
+    border-collapse: collapse;
+    color: #555;
+    th, td {padding: 5px 5px; text-align: left; margin: 1px; border: 1px solid #ccc; background: #fff;}
+    th {height: 35px; background: rgba(0,0,0,0.1); padding-left: 17px;}
+}
+.table_db {
+    td.quota { 
+        b {font-weight: normal;}
+        .form-control {width: 100px; display: none;}
+        span {display: none; margin-left: 10px; margin-right: 7px;}
+    }
+    tr.active td {padding-top: 5px; padding-bottom: 5px; background: rgba(0,0,0,0.2);}
+    tr.active td.quota {
+        b {display: none;}
+        .form-control {display: inline-block;}
+        span {display: inline-block;}
+    }
+    td.company {
+        span {margin-left: 12px;}
+        select {display: none;}
+    }
+    tr.active td.company {
+        span {display: none;}
+        select {display: inherit;}
+    }
+    .name {min-width: 300px;}
+    .quota {min-width: 140px;}
+    .action {min-width: 150px;}
+}
+.table_r {
+    th, td {padding: 7px 15px;}
+}
+.form-a {
+    display: none;
+    button[type="submit"] {margin-left: 25px; padding-left: 30px; padding-right: 30px;}
+    .form-group {position: relative; padding-bottom: 30px;}
+    label.error {position: absolute; left: 0; bottom: 0; white-space: nowrap; color: @Color-error; font-weight: normal;}
+    select {min-width: 165px;}
+}
+.form-b {
+    .form-control[disabled] {border: 0; background: transparent; box-shadow: none;}
+    table.table_db td {padding-top: 0; padding-bottom: 0; vertical-align: middle;}
+    table.table_db td.action {padding-left: 15px;}
+    .update {margin-top: 25px;}
+    button.btn[type="submit"] {min-width: 120px;}
+}
+#abusers_report {
+    table {
+        .company {min-width: 200px;}
+        .quota {min-width: 120px;}
+    }
+}
