@@ -1,13 +1,18 @@
-//  REST API page
+//  REST API access config
 var security_id = "mG0^&T9aFer!7an%Gmg@DEda7Mg";
+
+var rest_server_url = "http://vpndyrda/rest/";
+
+var rest_company_url = rest_server_url + "company.php";
+var rest_user_url = rest_server_url + "user.php";
+var rest_log_url = rest_server_url + "log.php";
+
 
 // After page loading
 jQuery(function($) {
     $(document).ready(function(){
         
         setupPages();
-        
-        AbusersPageLoad(); // debug purpose only
         
     });
 });
@@ -70,7 +75,6 @@ function setupPages() {
 *   COMPANIES PAGE     *
 ***********************/
 function CompaniesREST(ajax_data) {
-    var rest_company_url = "http://vpndyrda/company.php";
     
     $('#companies .empty').empty();
     $.ajax({ 
@@ -195,7 +199,6 @@ function CompaniesPageUnload() {
 *     USERS PAGE       *
 ***********************/
 function UsersREST(ajax_data) {
-    var rest_user_url = "http://vpndyrda/user.php";
     
     $('#users .empty').empty();
     $.ajax({ 
@@ -327,7 +330,6 @@ function UsersPageUnload() {
 *    ABUSERS PAGE      *
 ***********************/
 function AbusersREST(ajax_data) {
-    var rest_log_url = "http://vpndyrda/log.php";
     var form_id = '#f_report';
     $('#abusers .empty').empty();
     $('#abusers_report').hide();
@@ -378,7 +380,6 @@ function AbusersPageUnload() {
 }
 
 function AbusersShowReport() {
-    var rest_log_url = "http://vpndyrda/log.php";
     var form_id = '#f_report';
     var report_month_year = $(form_id+' select[name="month"]').val();
     var report_term = $(form_id+' select[name="month"] :selected').text();

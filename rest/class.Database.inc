@@ -1,4 +1,6 @@
 <?php
+require_once('config.php');
+
 /**
  * MySQLi database; only one connection is allowed.
  */
