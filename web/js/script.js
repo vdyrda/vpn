@@ -329,7 +329,43 @@ function UsersPageUnload() {
 /***********************
 *    ABUSERS PAGE      *
 ***********************/
-function AbusersREST(ajax_data) {
+// Abusers page setup
+function AbusersPageSetup() {
+    var form_id = '#f_report';
+
+    // fill the dropdown with months selection
+    var ajax_data = {'action': "get_all_months", 'security': security_id};
+    AbusersMonths(ajax_data);
+    
+    // set events triggers
+    $(form_id).on('submit', function(e) {
+        e.preventDefault();
+        AbusersShowReport();
+    }).on('reset', function(e) {
+        e.preventDefault();
+        ajax_data = {'action': "random_traffic", 'security': security_id};
+        AbusersMonths(ajax_data);
+    });
+    
+    // Show details on users
+    $(document).on('click', '#abusers_report .details', function(e) {
+        AbusersDetailsShowReport(e, this); 
+    });
+}
+
+// Abusers page loading
+function AbusersPageLoad() {
+    $('#abusers_report').hide();
+    $('#abusers').show(150);
+}
+
+// Abusers page unloading
+function AbusersPageUnload() {
+    $('#abusers, #abusers_report, #abusers_report_details').hide();
+    $('#abusers .empty').empty();
+}
+
+function AbusersMonths(ajax_data) {
     var form_id = '#f_report';
     $('#abusers .empty').empty();
     $('#abusers_report').hide();
@@ -351,57 +387,24 @@ function AbusersREST(ajax_data) {
     });
 }
 
-// Abusers page setup
-function AbusersPageSetup() {
-    var form_id = '#f_report';
-
-    // fill the dropdown with months selection
-    var ajax_data = {'action': "get_all_months", 'security': security_id};
-    AbusersREST(ajax_data);
-    
-    // set events triggers
-    $(form_id).on('submit', function(e) {
-        e.preventDefault();
-        AbusersShowReport();
-    }).on('reset', function(e) {
-        e.preventDefault();
-        ajax_data = {'action': "random_traffic", 'security': security_id};
-        AbusersREST(ajax_data);
-    });
-}
-// Abusers page loading
-function AbusersPageLoad() {
-    $('#abusers_report').hide();
-    $('#abusers').show(150);
-}
-// Abusers page unloading
-function AbusersPageUnload() {
-    $('#abusers').hide();
-}
-
-function AbusersShowReport() {
-    var form_id = '#f_report';
-    var report_month_year = $(form_id+' select[name="month"]').val();
-    var report_term = $(form_id+' select[name="month"] :selected').text();
-    var report_year = report_month_year.substr(0,4);
-    var report_month = report_month_year.substr(5,2);
-    var ajax_data = {'action': "get_abusers", 'security': security_id, 'month': report_month, 'year': report_year};
+function AbusersShowReport(e) {
     $('#abusers .empty').empty();
-    $.ajax({ 
-        method: "POST",
-        dataType: "json",
-        url: rest_log_url,
-        data: ajax_data,
-    })
+    $('#abusers_report_details').hide();
+    var ajax_data = getAbusersTerm();
+    
+    ajax_data.action = "get_abusers";
+    ajax_data.security = security_id;
+    
+    $.ajax({method: "POST", dataType: "json", url: rest_log_url, data: ajax_data,})
         .done(function( json ) {
             if (!json.companies || json.companies.length==0) {
                 $('#log_0').append('<p>No abusers.</p>');
             } else {
                 var report = $('#abusers_report');
-                $(report).find("h2 b").text(report_term);
+                $(report).find("h2 b").text(ajax_data['report_term']);
                 var table = $(report).find('table tbody');
                 $.each( json.companies, function( i, item ) {
-                    table.append('<tr><td>'+item.company_name+'</td><td>'+Bsize(item.company_used, 2)+'</td><td>'+Bsize(item.company_quota, 2)+'</td></tr>');
+                    table.append('<tr data-id="'+item.company_id+'"><td>'+item.company_name+'</td><td>'+Bsize(item.used, 2)+'</td><td>'+Bsize(item.company_quota, 2)+'</td><td><a href="" class="details">Details</td></tr>');
                 });
                 $(report).show();
             }
@@ -410,4 +413,44 @@ function AbusersShowReport() {
             $('#abusers_error').append('<p><b>Error:</b> Cannot retrieve the list of abusers</p>');
             console.log( "Request Failed: " + textStatus + ", " + error );
     });
+}
+
+function AbusersDetailsShowReport(e, this_is) {
+    e.preventDefault();
+    var details = '#abusers_report_details';
+    $(this_is).parent().parent().addClass('active').siblings().removeClass('active');
+
+    var ajax_data = getAbusersTerm();
+    var company_id = $(this_is).parent().parent().attr('data-id');
+    ajax_data.action ="get_abusers_details";
+    ajax_data.security = security_id;
+    ajax_data.company_id = company_id;
+    
+    $(details+" tbody").empty();
+    
+    $.ajax({
+        method: "POST", dataType: "json", url: rest_log_url, data: ajax_data,
+    }).done(function ( json ) {
+        if (!json.users || json.users.length==0) {
+            $('#log_0').empty().append('<p>No abusers details.</p>');
+        } else {
+            $.each(json.users, function(i, item) {
+                $(details+" tbody").append("<tr><td>"+item.user_name+"</td><td>"+Bsize(item.used, 2)+"</td></tr>");
+            });
+            $(details+" h3").html("Users of company <b>"+$(this_is).parent().siblings().first().text()+"</b>");
+            $(details).show();
+        }
+    }).fail(function(jqxhr, textStatus, error) {
+        $('#abusers_error').append('<p><b>Error:</b> Cannot retrieve the list of abusers</p>');
+        console.log( "Request Failed: " + textStatus + ", " + error );
+    });
+}
+
+function getAbusersTerm() {
+    var form_id = '#f_report';
+    var report_month_year = $(form_id+' select[name="month"]').val();
+    var report_term = $(form_id+' select[name="month"] :selected').text();
+    var report_year = report_month_year.substr(0,4);
+    var report_month = report_month_year.substr(5,2);
+    return {'month': report_month, 'year': report_year, 'report_term': report_term};
 }

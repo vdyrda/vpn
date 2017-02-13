@@ -106,15 +106,15 @@
             <h1>Abusers</h1>
             <form action="" id="f_report" class="form-inline">
                 <div class="form-group">
+                    <button type="reset" class="btn btn-success">Generate Data</button>
+                </div>
+                <br><br>
+                <div class="form-group">
                     <label for="month">Choose a month:</label>
                     <select name="month" id="month" class="form-control"></select>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">Show Report</button>
-                </div>
-                <br><br>
-                <div class="form-group">
-                    <button type="reset" class="btn btn-success">Generate Data</button>
                 </div>
             </form>
             <br>
@@ -125,9 +125,20 @@
                 <h2>Report for <b class="empty"></b></h2>
                 <table class="table_r">
                     <thead>
-                        <tr><th class="company">Company</th><th class="quota">Used</th><th class="quota">Quota</th></tr>
+                        <tr><th class="company">Company</th><th class="quota">Used</th><th class="quota">Quota</th><th>Actions</th></tr>
                     </thead>
                     <tbody class="empty"></tbody>
+                </table>
+            </div>
+            
+            <div id="abusers_report_details">
+                <h3 class="empty"></h3>
+                <table class="table_r">
+                    <thead>
+                        <tr><th>User</th><th>Used</th></tr>
+                    </thead>
+                    <tbody class="empty">
+                    </tbody>
                 </table>
             </div>
         </div>

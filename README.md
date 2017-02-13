@@ -1,6 +1,6 @@
 # VPN Admin
 
-> Official documentation for VPN Admin for Postindustria
+> Official documentation for VPN Admin
 
 ### [Start](/web/index.php)
 

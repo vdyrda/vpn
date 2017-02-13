@@ -18,26 +18,18 @@ class Log {
         return array('months'=>$months);
     }
     
-    public static function get_companis_quota($params) {
+    
+    /* 
+    /* Get companies (optionally exceeded their quota) ordered descending by used traffic
+    */
+    public static function get_companies_quota($params) {
         $db = Database::getInstance();
         $mysqli = $db->getConnection();
-        $companies = array();
-        // date format is "%Y-%m-%d %H:%M:%S"
-        $month = $params['month'];
-        $year = $params['year'];
         $exceed = isset($params['exceed']) ? $params['exceed'] : false;
-        if ($month*$year == 0) {
-            // current month
-            $time_start = date("Y-m-")."01 00:00:00";
-            $time_end = date("Y-m-d")." 23:59:59";
-        } else {
-            // requested month
-            $start = "{$year}-{$month}-01";
-            $time_start = "{$start} 00:00:00";
-            $time_end = date("Y-m-t", strtotime($start))." 23:59:59";
-        }
+        $companies = array();
+        list($time_start, $time_end) = getSafeTimePeriod($params['year'], $params['month']);
         
-        $sql_query  = "SELECT SUM(log.size) AS `company_used`, ";
+        $sql_query  = "SELECT SUM(log.size) AS `used`, ";
         $sql_query .=   "user.company_id AS `company_id`, ";
         $sql_query .=   "company.name AS `company_name`, ";
         $sql_query .=   "company.quota AS company_quota ";
@@ -48,12 +40,12 @@ class Log {
         $sql_query .= "     STR_TO_DATE('{$time_start}','%Y-%m-%d %H:%i:%s') AND ";
         $sql_query .= "     STR_TO_DATE('{$time_end}}','%Y-%m-%d %H:%i:%s')) ";
         $sql_query .= "GROUP BY `company_id` ";
-        $sql_query .= "ORDER BY `size` DESC ";
+        $sql_query .= "ORDER BY `used` DESC ";
         
         $result = $mysqli->query($sql_query);
         if ($result) {
             while ($row = $result->fetch_assoc()) {
-                if ($exceed && $row['company_used'] <= $row['company_quota']) {
+                if ($exceed && $row['used'] <= $row['company_quota']) {
                     continue;
                 }
                 $companies[] = $row;
@@ -63,6 +55,38 @@ class Log {
             return array('msg'=>array('result'=>'error', 'error_msg'=>$mysqli->error));
         }
     }
+    
+    /** 
+    /* Get users of the selected company ordered descending by used traffic
+    */
+    public static function get_company_users_used($params) {
+        $db = Database::getInstance();
+        $mysqli = $db->getConnection();
+        $users = array();
+        list($time_start, $time_end) = getSafeTimePeriod($params['year'], $params['month']);
+        
+        $sql_query  = "SELECT SUM(log.size) AS `used`, ";
+        $sql_query .=   "user.name AS `user_name` ";
+        $sql_query .= "FROM `log`,`user` ";
+        $sql_query .= "WHERE (user.company_id=".$params['company_id'].") ";
+        $sql_query .=   "AND (log.user_id=user.id) ";
+        $sql_query .=   "AND (log.time_stamp BETWEEN ";
+        $sql_query .=       "STR_TO_DATE('{$time_start}','%Y-%m-%d %H:%i:%s') AND ";
+        $sql_query .=       "STR_TO_DATE('{$time_end}}','%Y-%m-%d %H:%i:%s')) ";
+        $sql_query .= "GROUP BY `user_name` ";
+        $sql_query .= "ORDER BY `used` DESC ";
+  
+        $result = $mysqli->query($sql_query);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $users[] = $row;
+            }
+            return array('msg'=>array('result'=>'ok'), 'users'=>$users);
+        } else {
+            return array('msg'=>array('result'=>'error', 'error_msg'=>$mysqli->error));
+        }
+    }
+    
     
 /*  Function Description: 
 
@@ -116,4 +140,19 @@ class Log {
         return self::get_all_months();
     }
     
+}
+
+function getSafeTimePeriod($year = 0, $month = 0) {
+    // date format is "%Y-%m-%d %H:%M:%S"
+    if ($month*$year == 0) {
+        // current month
+        $time_start = date("Y-m-")."01 00:00:00";
+        $time_end = date("Y-m-d")." 23:59:59";
+    } else {
+        // requested month        
+        $start = "{$year}-".sprintf('%02s',$month)."-01";
+        $time_start = "{$start} 00:00:00";
+        $time_end = date("Y-m-t", strtotime($start))." 23:59:59";
+    }
+    return array($time_start, $time_end);
 }

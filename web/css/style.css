@@ -235,3 +235,21 @@ table th {
 #abusers_report table .quota {
   min-width: 120px;
 }
+#abusers_report table tr.active td {
+  transition: all 0.3s;
+  background: #2d85c5;
+  color: #ffffff;
+}
+#abusers_report table tr.active td a {
+  color: #ffffff;
+}
+#abusers_report_details {
+  display: none;
+  margin-top: 40px;
+}
+#abusers_report_details table tr th:nth-child(1) {
+  width: 250px;
+}
+#abusers_report_details table tr th:nth-child(2) {
+  width: 150px;
+}

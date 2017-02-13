@@ -98,5 +98,21 @@ table {
     table {
         .company {min-width: 200px;}
         .quota {min-width: 120px;}
+        tr.active td {
+            transition: all 0.3s;
+            background: @Color-active; 
+            color: @Color-inverse;
+            a {color: @Color-inverse;}
+        }
     }
 }
+#abusers_report_details {
+    display: none; 
+    margin-top: 40px;
+    table tr { 
+        th:nth-child(1) {width: 250px;}
+        th:nth-child(2) {width: 150px;}
+    }
+    
+}
+

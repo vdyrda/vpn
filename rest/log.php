@@ -14,7 +14,14 @@ if ($security === SECURITY) {
             $month = (isset($_POST['month'])) ? (int)$_POST['month'] : 0;
             $year = (isset($_POST['year'])) ? (int)$_POST['year'] : 0;
             $params = array('month'=>$month, 'year'=>$year, 'exceed'=>true);
-            echo json_encode(Log::get_companis_quota($params));
+            echo json_encode(Log::get_companies_quota($params));
+            break;
+        case 'get_abusers_details': 
+            $month = (isset($_POST['month'])) ? (int)$_POST['month'] : 0;
+            $year = (isset($_POST['year'])) ? (int)$_POST['year'] : 0;
+            $company_id = (isset($_POST['company_id'])) ? (int)$_POST['company_id'] : null;
+            $params = array('company_id'=>$company_id, 'month'=>$month, 'year'=>$year);
+            echo json_encode(Log::get_company_users_used($params));
             break;
         case 'random_traffic': 
             echo json_encode(Log::random_traffic());
